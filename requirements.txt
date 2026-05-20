@@ -1,0 +1,7 @@
+PyQt5
+opencv-python
+mediapipe
+numpy
+onnxruntime
+psycopg2
+pyinstaller

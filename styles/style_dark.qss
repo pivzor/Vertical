@@ -1,0 +1,303 @@
+/* Базовые настройки окон */
+QMainWindow, QDialog, QMessageBox, QFileDialog {
+    background-color: #0d1117;
+}
+
+/* Сбрасываем фон только для базовых контейнеров компоновки */
+.QWidget {
+    background-color: transparent;
+}
+
+/* Настройки всплывающих окон сообщений */
+QMessageBox QLabel, QFileDialog QLabel, QDialog QLabel {
+    color: #e6edf3;
+    background-color: transparent;
+    font-size: 14px;
+}
+
+/* Автоматическая стилизация карточек и панелей через QFrame */
+QFrame {
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+}
+
+/* Специфический класс для карточек (включая страницу About) */
+QWidget#card, .QCard, #card {
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 15px;
+    padding: 20px;
+}
+
+/* Текстовые метки */
+QLabel {
+    background-color: transparent;
+    color: #e6edf3;
+    font-size: 14px;
+    border: none;
+}
+
+/* Кнопки (включая системные кнопки в QMessageBox) */
+QPushButton, QMessageBox QPushButton {
+    background-color: #21262d;
+    border-radius: 10px;
+    padding: 8px 16px;
+    border: 1px solid #30363d;
+    font-weight: bold;
+    color: #e6edf3;
+    min-width: 70px;
+}
+
+QPushButton:hover, QMessageBox QPushButton:hover {
+    background-color: #30363d;
+    border-color: #444c56;
+}
+
+QPushButton:pressed, QMessageBox QPushButton:pressed {
+    background-color: #1a1e24;
+    border-color: #30363d;
+}
+
+/* Специальные кнопки и их состояния перегрузки */
+#btnRefresh, #btnPdf, #btnStart, #btnStop, #btnLogout {
+    background-color: #21262d;
+    border: 1px solid #30363d;
+    color: #e6edf3;
+}
+
+#btnRefresh:hover, #btnPdf:hover, #btnStart:hover, #btnStop:hover, #btnLogout:hover {
+    background-color: #30363d;
+}
+
+#btnStop:disabled {
+    background-color: #161b22;
+    border-color: #21262d;
+    color: #484f58;
+}
+
+QPushButton#github_btn {
+    background-color: #24292e;
+    color: #ffffff;
+    min-height: 40px;
+    font-size: 14px;
+}
+
+QPushButton#github_btn:hover {
+    background-color: #3a3f44;
+}
+
+/* Поля ввода текста */
+QLineEdit {
+    background-color: #0d1117;
+    color: #e6edf3;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 8px;
+    font-size: 14px;
+}
+
+QLineEdit:focus {
+    border-color: #58a6ff;
+}
+
+/* Контейнер вкладок */
+QTabWidget::pane {
+    border: 1px solid #30363d;
+    background-color: #161b22;
+    border-radius: 8px;
+    top: -1px;
+}
+
+QTabWidget::tab-bar {
+    left: 5px;
+}
+
+/* Заголовки вкладок */
+QTabBar::tab {
+    background-color: #21262d;
+    color: #8b949e;
+    border: 1px solid #30363d;
+    border-bottom: none;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    padding: 8px 16px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background-color: #161b22;
+    color: #e6edf3;
+    border-bottom: 1px solid #161b22;
+}
+
+QTabBar::tab:hover:!selected {
+    background-color: #30363d;
+    color: #e6edf3;
+}
+
+/* Выпадающие списки */
+QComboBox {
+    padding: 8px;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    background-color: #161b22;
+    color: #e6edf3;
+}
+
+QComboBox:hover {
+    border-color: #444c56;
+}
+
+QComboBox::drop-down {
+    border: none;
+}
+
+QComboBox::down-arrow {
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid #e6edf3;
+}
+
+/* Выпадающий список (popup) */
+QComboBox QAbstractItemView {
+    background-color: #161b22;
+    color: #e6edf3;
+    selection-background-color: #30363d;
+    selection-color: #e6edf3;
+    border: 1px solid #30363d;
+}
+
+QComboBox QAbstractItemView::item {
+    background-color: #161b22;
+    color: #e6edf3;
+    padding: 5px;
+}
+
+QComboBox QAbstractItemView::item:hover {
+    background-color: #30363d;
+}
+
+/* Прогресс-бары */
+QProgressBar {
+    border: none;
+    border-radius: 10px;
+    background-color: #161b22;
+    height: 30px;
+    text-align: center;
+    font-weight: bold;
+    color: #e6edf3;
+}
+
+QProgressBar::chunk {
+    border-radius: 10px;
+    background-color: #3a5a8a;
+}
+
+/* Слайдер */
+QSlider::groove:horizontal {
+    height: 6px;
+    background: #161b22;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    background: #3a5a8a;
+    width: 18px;
+    height: 18px;
+    margin: -6px 0;
+    border-radius: 9px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: #4f73aa;
+}
+
+QSlider::sub-page:horizontal {
+    background: #3a5a8a;
+    border-radius: 3px;
+}
+
+/* Видео контейнер */
+#videoContainer {
+    background-color: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    min-height: 500px;
+}
+
+/* Информационные фреймы */
+.info-frame {
+    background-color: #21262d;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+/* Боковая панель */
+Sidebar, Sidebar > QWidget, QListWidget, QListWidget::item {
+    background-color: #161b22;
+    color: #e6edf3;
+}
+
+/* Заголовки */
+.title-main {
+    font-size: 24px;
+    font-weight: bold;
+    color: #e6edf3;
+}
+
+.title-card {
+    font-size: 16px;
+    font-weight: bold;
+    color: #e6edf3;
+}
+
+.title-metrics {
+    font-size: 18px;
+    font-weight: bold;
+    color: #e6edf3;
+}
+
+/* Значения */
+.value-large {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.value-medium {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.value-score {
+    font-size: 32px;
+    font-weight: bold;
+}
+
+/* Цвета для значений */
+.value-blue { color: #58a6ff; }
+.value-green { color: #3fb950; }
+.value-red { color: #f85149; }
+.value-orange { color: #db6d28; }
+
+/* Статусы */
+.status-active {
+    color: #3fb950;
+    font-weight: bold;
+}
+
+.status-inactive {
+    color: #8b949e;
+    font-weight: bold;
+}
+
+/* Подписи */
+.label-small {
+    color: #8b949e;
+    font-size: 12px;
+}
+
+.label-metrics {
+    color: #e6edf3;
+    font-size: 14px;
+}

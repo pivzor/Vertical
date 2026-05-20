@@ -1,0 +1,27 @@
+# Среда разработки (IDE)
+.idea/
+.vscode/
+
+# Папки компиляции Python (включая cv2 и другие библиотеки)
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Папки сборщика (PyInstaller / Временные файлы)
+build/
+dist/
+
+# Результаты сборки (Установочные файлы)
+output/
+installers/
+
+# Конкретные файлы логов и спеки
+Vertical.spec
+*.spec
+*.log
+app.txt
+
+# Файлы локальных конфигураций
+settings.json
+.env
