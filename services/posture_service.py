@@ -28,7 +28,7 @@ class PostureService:
     #Создание модели MediaPipe Pose
     def _create_pose(self):
         return self.mp_pose.Pose(
-            model_complexity=1,
+            model_complexity=2,
             min_detection_confidence=0.3 + self.accuracy * 0.5,
             min_tracking_confidence=0.3 + self.accuracy * 0.5
         )
@@ -67,23 +67,22 @@ class PostureService:
 
         return score, "front"
 
-    #Анализ осанки сбоку
     def _side(self, lm):
 
-        #Определение стороны с лучшей видимостью
-        left_vis = (
+        left_score = (
             lm[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].visibility +
-            lm[self.mp_pose.PoseLandmark.LEFT_HIP.value].visibility
+            lm[self.mp_pose.PoseLandmark.LEFT_HIP.value].visibility +
+            lm[self.mp_pose.PoseLandmark.LEFT_KNEE.value].visibility
         )
 
-        right_vis = (
+        right_score = (
             lm[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].visibility +
-            lm[self.mp_pose.PoseLandmark.RIGHT_HIP.value].visibility
+            lm[self.mp_pose.PoseLandmark.RIGHT_HIP.value].visibility +
+            lm[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].visibility
         )
 
-        use_right = right_vis > left_vis
+        use_right = right_score > left_score
 
-        #Выбор ключевых точек тела
         if use_right:
             ear = lm[self.mp_pose.PoseLandmark.RIGHT_EAR.value]
             shoulder = lm[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value]
@@ -95,29 +94,29 @@ class PostureService:
             hip = lm[self.mp_pose.PoseLandmark.LEFT_HIP.value]
             knee = lm[self.mp_pose.PoseLandmark.LEFT_KNEE.value]
 
-        #Нормализация размеров тела
-        body_len = abs(shoulder.y - hip.y) + 1e-6
+        points = [ear, shoulder, hip, knee]
 
-        #Смещение головы вперед
-        head_forward = (ear.x - shoulder.x)
+        for p in points:
+            if p.visibility < 0.5:
+                return None, tr("posture_bad_visibility")
 
-        #Смещение плеч вперед
-        shoulder_forward = (shoulder.x - hip.x)
 
-        #Наклон корпуса
-        torso_tilt = abs(shoulder.x - hip.x)
+        body_height = abs(shoulder.y - hip.y)
 
-        #Смещение таза
-        hip_shift = abs(hip.x - knee.x)
+        if body_height < 0.05:
+            return None, tr("posture_bad_visibility")
 
-        #Вычисление угла шеи
+        head_forward = abs(ear.x - shoulder.x) / body_height
+        shoulder_forward = abs(shoulder.x - hip.x) / body_height
+        hip_shift = abs(hip.x - knee.x) / body_height
+
+
         neck_angle = self.calculate_angle(
             (ear.x, ear.y),
             (shoulder.x, shoulder.y),
             (hip.x, hip.y)
         )
 
-        #Вычисление угла спины
         back_angle = self.calculate_angle(
             (shoulder.x, shoulder.y),
             (hip.x, hip.y),
@@ -126,28 +125,20 @@ class PostureService:
 
         self.last_angle = neck_angle
 
-        #Начальная оценка осанки
+
         score = 100
-
-        #Снижение оценки при выдвижении головы вперед
-        score -= max(0, abs(head_forward)) * 220
-
-        #Снижение оценки при сутулости плеч
-        score -= max(0, abs(shoulder_forward)) * 260
-
-        #Снижение оценки при смещении таза
-        score -= hip_shift * 120
-
-        #Снижение оценки при наклоне корпуса
-        score -= torso_tilt * 180
-
-        #Снижение оценки при уменьшении угла шеи
-        if neck_angle < 145:
-            score -= (145 - neck_angle) * 1.8
-
-        #Снижение оценки при уменьшении угла спины
-        if back_angle < 165:
-            score -= (165 - back_angle) * 1.5
+        # голова
+        score -= head_forward * 18
+        # плечи
+        score -= shoulder_forward * 22
+        # таз
+        score -= hip_shift * 12
+        # шея
+        if neck_angle < 140:
+            score -= (140 - neck_angle) * 0.8
+        # спина
+        if back_angle < 160:
+            score -= (160 - back_angle) * 0.7
 
         return score, "side"
     
@@ -201,6 +192,9 @@ class PostureService:
         else:
             raw_score, status = self._side(lm)
 
+        if raw_score is None:
+            return None, 0, status, result
+
         #Сглаживание итоговой оценки
         score = int(self._smooth(raw_score))
 
@@ -208,16 +202,18 @@ class PostureService:
         score = max(0, min(100, score))
 
         #Определение текстового состояния осанки
-        if score >= 90:
+        if score >= 85:
             status = tr("posture_excellent")
-        elif score >= 80:
+
+        elif score >= 75:
             status = tr("posture_good")
-        elif score >= 70:
+
+        elif score >= 55:
             status = tr("posture_slight")
+
         elif score >= 40:
             status = tr("posture_slouch")
-        else:
-            status = tr("posture_bad")
+
 
         #Сохранение координат ключевых точек
         keypoints = [(p.x, p.y, p.z) for p in lm]

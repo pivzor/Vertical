@@ -91,3 +91,10 @@ class SettingsService:
             "min_tracking_confidence":
                 self.settings["min_tracking_confidence"]
         }
+    
+    def get_show_skeleton(self):
+        return self.settings.get("show_skeleton", True)
+
+    def set_show_skeleton(self, value):
+        self.settings["show_skeleton"] = value
+        self.save_settings()

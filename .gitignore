@@ -25,3 +25,5 @@ app.txt
 # Файлы локальных конфигураций
 settings.json
 .env
+
+docs/

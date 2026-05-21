@@ -248,12 +248,12 @@ class MonitoringPage(QWidget):
         self.last_score = int(score)
         self.score_label.setText(str(int(score)))
 
-        if score >= 90:
+        if score >= 85:
             self.status_text.setText(tr("posture_excellent"))
-        elif score >= 80:
+        elif score >= 75:
             self.status_text.setText(tr("posture_good"))
-        elif score >= 70:
-            self.status_text.setText(tr("posture_slouch"))
+        elif score >= 55:
+            self.status_text.setText(tr("posture_slight"))
         else:
             self.status_text.setText(tr("posture_bad"))
 

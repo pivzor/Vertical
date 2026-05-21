@@ -5,3 +5,4 @@ numpy
 onnxruntime
 psycopg2
 pyinstaller
+fpdf

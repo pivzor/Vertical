@@ -130,7 +130,10 @@
     "github_link": "GitHub", 
 
     "mode_front": "Режим спереди",
-    "mode_side": "Режим сзади",
-    "camera_not_found":"камера не найдена"
+    "mode_side": "Режим сбоку",
+    "camera_not_found":"камера не найдена",
 
+
+    "posture_no_person": "Человек не обнаружен",
+    "posture_bad_visibility": "Недостаточно тела в кадре"
 }

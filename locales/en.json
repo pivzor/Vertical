@@ -130,5 +130,9 @@
 
     "mode_front": "Front mode",
     "mode_side": "Side mode",
-    "camera_not_found":"Camera not found"
+    "camera_not_found":"Camera not found", 
+
+    "posture_no_person": "No person detected",
+    "posture_bad_visibility": "Body is not fully visible"
+
 }

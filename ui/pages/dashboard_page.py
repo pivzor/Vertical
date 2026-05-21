@@ -304,12 +304,18 @@ class DashboardPage(QWidget):
                 bad = sum(1 for x in scores if x < 60)
 
                 # ===== STATUS (ЛОКАЛИЗАЦИЯ) =====
-                if avg >= 80:
+                if avg >= 85:
                     status = tr("posture_excellent")
-                elif avg >= 60:
+                elif avg >= 70:
                     status = tr("posture_good")
-                else:
+                elif avg >= 55:
+                    status = tr("posture_slight")
+
+                elif avg >= 40:
                     status = tr("posture_slouch")
+
+                else:
+                    status = tr("posture_bad")
 
                 pdf.cell(60, 8, s['starttime'].strftime("%d.%m %H:%M"), border=1)
                 pdf.cell(40, 8, str(int(avg)), border=1)
