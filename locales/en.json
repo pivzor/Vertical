@@ -17,6 +17,10 @@
     "violations": "Violations",
     "total_sessions": "Total Sessions",
     "best_score": "Best Score",
+    "trend": "Trend",
+    "avg_score_by_sessions": "Average posture score by sessions",
+    "session_quality_summary": "Session quality breakdown",
+    "sessions_count": "ses.",
 
     "good_posture": "Good posture (score ≥ 80):",
     "bad_posture": "Bad posture (score < 60):",
@@ -26,7 +30,7 @@
     "status": "Status:",
     "posture_excellent": "Excellent",
     "posture_good": "Good",
-    "posture_slight": "Сan be better",
+    "posture_slight": "Can be better",
     "posture_slouch": "Slouch",
     "posture_bad": "Bad",
     "avg_score_label": "Avg Score:",
@@ -130,9 +134,11 @@
 
     "mode_front": "Front mode",
     "mode_side": "Side mode",
-    "camera_not_found":"Camera not found", 
+    "camera_not_found": "Camera not found",
+    "camera": "Camera",
 
     "posture_no_person": "No person detected",
-    "posture_bad_visibility": "Body is not fully visible"
+    "posture_bad_visibility": "Body is not fully visible",
 
+    "posture_notification": "Please correct your posture!"
 }

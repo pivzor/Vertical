@@ -13,25 +13,28 @@
     "this_month": "Этот месяц",
     "this_year": "Этот год",
 
-    "avg_score": "Средний счет",
+    "avg_score": "Средний балл",
     "violations": "Нарушений",
     "total_sessions": "Всего сессий",
-    "best_score": "Лучший счет",
+    "best_score": "Лучший балл",
+    "trend": "Тренд",
+    "avg_score_by_sessions": "Средний балл осанки по сессиям",
+    "session_quality_summary": "Распределение качества сессий",
+    "sessions_count": "сес.",
 
-    "good_posture": "Хорошая осанка (счет ≥ 80):",
-    "bad_posture": "Плохая осанка (счет < 60):",
+    "good_posture": "Хорошая осанка (балл ≥ 80):",
+    "bad_posture": "Плохая осанка (балл < 60):",
 
     "video_stream": "Видеопоток",
-    "current_score": "Текущий счет:",
+    "current_score": "Текущий балл:",
     "status": "Статус:",
     "posture_excellent": "Отлично",
     "posture_good": "Хорошо",
     "posture_slight": "Можно лучше",
     "posture_slouch": "Сутулость",
     "posture_bad": "Плохо",
-    "avg_score_label": "Средний счет:",
+    "avg_score_label": "Средний балл:",
     "no_active_session": "Нет активной сессии",
-
 
     "status_waiting": "Ожидание",
     "status_active": "Активна",
@@ -49,7 +52,7 @@
 
     "theme_title": "Оформление",
     "theme_light": "Светлая",
-    "theme_dark": "Темная",
+    "theme_dark": "Тёмная",
 
     "user_info": "Информация о пользователе",
     "user_name": "Имя: {0}",
@@ -87,7 +90,7 @@
     "session_start_error": "Ошибка запуска: {0}",
     "session_end_error": "Ошибка завершения: {0}",
     "session_end_confirm": "Завершение сессии",
-    "session_end_msg": "Завершить сессию #{0}?\n\nСредний счет: {1}\nКадров: {2}",
+    "session_end_msg": "Завершить сессию #{0}?\n\nСредний балл: {1}\nКадров: {2}",
     "session_end_success": "Сессия завершена",
     "session_end_excellent": "Отлично!",
     "session_end_good": "Хорошо!",
@@ -96,14 +99,14 @@
     "confirm_logout": "Выход",
     "confirm_logout_msg": "Вы уверены, что хотите выйти?",
 
-    "pdf_report": "Отчет по осанке",
+    "pdf_report": "Отчёт по осанке",
     "pdf_date": "Дата: {0}",
     "pdf_user_id": "ID пользователя: {0}",
     "pdf_statistics": "Статистика:",
     "pdf_sessions": "Сессии:",
     "pdf_completed": "Хорошая осанка",
     "pdf_needs_attention": "Требует внимания",
-    "datetime": "Дата & Время",
+    "datetime": "Дата и время",
     "pdf_username": "Имя пользователя: {0}",
     "pdf_session_id": "ID сессии",
     "pdf_status": "Статус",
@@ -127,13 +130,15 @@
     "posture_tips_title": "Советы для правильной осанки",
     "posture_tips": "• Держите спину прямо, плечи расправлены\n• Следите, чтобы экран был на уровне глаз\n• Делайте перерывы каждые 30-40 минут\n• Выполняйте упражнения для спины\n• Используйте эргономичное кресло",
     "contacts": "Контакты",
-    "github_link": "GitHub", 
+    "github_link": "GitHub",
 
     "mode_front": "Режим спереди",
     "mode_side": "Режим сбоку",
-    "camera_not_found":"камера не найдена",
-
+    "camera_not_found": "Камера не найдена",
+    "camera": "Камера",
 
     "posture_no_person": "Человек не обнаружен",
-    "posture_bad_visibility": "Недостаточно тела в кадре"
+    "posture_bad_visibility": "Недостаточно тела в кадре",
+
+    "posture_notification": "Обратите внимание на осанку!"
 }

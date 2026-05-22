@@ -300,3 +300,57 @@ Sidebar, Sidebar > QWidget, QListWidget, QListWidget::item {
     color: #000000;
     font-size: 14px;
 }
+/* DASHBOARD */
+
+.dashboard-card-title {
+    font-size: 12px;
+    color: #8b949e;
+}
+
+.dashboard-card-value {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.dashboard-section-title {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+/* TREND */
+
+.trend-positive {
+    color: #3fb950;
+}
+
+.trend-negative {
+    color: #f85149;
+}
+
+/* SUMMARY */
+
+.summary-label {
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+}
+
+.summary-excellent {
+    background-color: #1a3a1a;
+    color: #4caf50;
+}
+
+.summary-good {
+    background-color: #1a2a3a;
+    color: #64b5f6;
+}
+
+.summary-fair {
+    background-color: #3a2a0a;
+    color: #ffb300;
+}
+
+.summary-poor {
+    background-color: #3a1a1a;
+    color: #ef5350;
+}

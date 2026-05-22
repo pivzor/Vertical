@@ -9,6 +9,9 @@ from locales.locale_manager import tr, get_locale
 
 import cv2
 
+from PyQt5.QtWidgets import QSystemTrayIcon, QStyle
+from PyQt5.QtCore import QDateTime
+
 
 class MonitoringPage(QWidget):
     def __init__(self, session_manager, db, analyzer, settings_service):
@@ -26,6 +29,11 @@ class MonitoringPage(QWidget):
 
         self.smooth_buffer = []
 
+        self.tray = QSystemTrayIcon(self)
+        self.tray.setIcon(self.style().standardIcon(QStyle.SP_ComputerIcon))
+        self.tray.setVisible(True)
+
+        self.last_notify_time = QDateTime.currentDateTime().addSecs(-60)
 
         self.init_ui()
 
@@ -248,6 +256,7 @@ class MonitoringPage(QWidget):
         self.last_score = int(score)
         self.score_label.setText(str(int(score)))
 
+        # --- UI статус ---
         if score >= 85:
             self.status_text.setText(tr("posture_excellent"))
         elif score >= 75:
@@ -257,6 +266,30 @@ class MonitoringPage(QWidget):
         else:
             self.status_text.setText(tr("posture_bad"))
 
+        # =========================
+        # 🚨 УВЕДОМЛЕНИЯ
+        # =========================
+
+        is_bad = score < 60
+        app_in_background = self.isMinimized() or not self.isActiveWindow()
+
+        now = QDateTime.currentDateTime()
+
+        if is_bad and app_in_background:
+            if self.last_notify_time.secsTo(now) > 25:
+                self.show_notification(
+                    tr("warning"),
+                    tr("session_end_bad")  # или отдельный ключ лучше сделать
+                )
+                self.last_notify_time = now
+
+    def show_notification(self, title, message):
+        self.tray.showMessage(
+            title,
+            message,
+            QSystemTrayIcon.Information,
+            3000
+        )
 
     # ================= UI =================
     def retranslate_ui(self):

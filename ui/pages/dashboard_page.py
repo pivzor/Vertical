@@ -75,12 +75,12 @@ class DashboardPage(QWidget):
         # --- STATS ---
         stats_layout = QHBoxLayout()
         self.avg_card = self.create_stat_card()
-        self.bad_card = self.create_stat_card()
+        # self.bad_card = self.create_stat_card()
         self.sessions_card = self.create_stat_card()
         self.best_card = self.create_stat_card()
 
         stats_layout.addWidget(self.avg_card)
-        stats_layout.addWidget(self.bad_card)
+        # stats_layout.addWidget(self.bad_card)
         stats_layout.addWidget(self.sessions_card)
         stats_layout.addWidget(self.best_card)
 
@@ -99,19 +99,19 @@ class DashboardPage(QWidget):
 
         self.main_layout.addWidget(graph_card)
 
-        # --- PROGRESS ---
-        self.good_progress = QProgressBar()
-        self.bad_progress = QProgressBar()
+        # # --- PROGRESS ---
+        # self.good_progress = QProgressBar()
+        # self.bad_progress = QProgressBar()
 
-        progress_card = QFrame()
-        progress_card.setObjectName("card")
-        progress_layout = QVBoxLayout()
+        # progress_card = QFrame()
+        # progress_card.setObjectName("card")
+        # progress_layout = QVBoxLayout()
 
-        progress_layout.addWidget(self.good_progress)
-        progress_layout.addWidget(self.bad_progress)
+        # progress_layout.addWidget(self.good_progress)
+        # progress_layout.addWidget(self.bad_progress)
 
-        progress_card.setLayout(progress_layout)
-        self.main_layout.addWidget(progress_card)
+        # progress_card.setLayout(progress_layout)
+        # self.main_layout.addWidget(progress_card)
 
         self.setLayout(self.main_layout)
 
@@ -218,29 +218,60 @@ class DashboardPage(QWidget):
         # --- вычисления ---
         avg_all = int(sum(s["avg"] for s in stats) / len(stats))
         best = int(max(s["max"] for s in stats))
-        bad_total = sum(s["bad"] for s in stats)
+        # bad_total = sum(s["bad"] for s in stats)
 
         self.avg_card.value_label.setText(str(avg_all))
         self.best_card.value_label.setText(str(best))
         self.sessions_card.value_label.setText(str(len(stats)))
-        self.bad_card.value_label.setText(str(bad_total))
+        # self.bad_card.value_label.setText(str(bad_total))
 
         # --- график ---
         self.ax.clear()
-        self.ax.bar([s["date"] for s in stats], [s["avg"] for s in stats])
+
+        dates = [s["date"] for s in stats]
+        values = [s["avg"] for s in stats]
+
+        self.ax.plot(
+            dates,
+            values,
+            marker='o',
+            linewidth=2
+        )
+
+        self.ax.set_ylim(0, 100)
+
+        self.ax.grid(True, linestyle='--', alpha=0.4)
+
+        self.ax.set_title(
+            tr("avg_score_by_sessions"),
+            pad=15
+        )
+
+        self.ax.set_ylabel(tr("avg_score"))
+
+        avg_line = sum(values) / len(values)
+
+        self.ax.axhline(
+            avg_line,
+            linestyle='--',
+            linewidth=1
+        )
+
+        self.figure.tight_layout()
+        self.apply_chart_theme()
         self.canvas.draw()
 
         # --- прогресс ---
-        good = sum(1 for s in stats if s["avg"] >= 80)
-        bad = sum(1 for s in stats if s["avg"] < 60)
-        total = good + bad
+        # good = sum(1 for s in stats if s["avg"] >= 80)
+        # bad = sum(1 for s in stats if s["avg"] < 60)
+        # total = good + bad
 
-        if total:
-            self.good_progress.setValue(int(good / total * 100))
-            self.bad_progress.setValue(int(bad / total * 100))
-        else:
-            self.good_progress.setValue(0)
-            self.bad_progress.setValue(0)
+        # if total:
+        #     self.good_progress.setValue(int(good / total * 100))
+        #     self.bad_progress.setValue(int(bad / total * 100))
+        # else:
+        #     self.good_progress.setValue(0)
+        #     self.bad_progress.setValue(0)
 
     # ---------------- PDF ----------------
 
@@ -289,7 +320,7 @@ class DashboardPage(QWidget):
             # ===== HEADER (ЛОКАЛИЗАЦИЯ) =====
             pdf.cell(60, 8, tr("pdf_date_header"), border=1)
             pdf.cell(40, 8, tr("pdf_avg_score_header"), border=1)
-            pdf.cell(40, 8, tr("pdf_bad_frames_header"), border=1)
+            # pdf.cell(40, 8, tr("pdf_bad_frames_header"), border=1)
             pdf.cell(50, 8, tr("pdf_status_header"), border=1)
             pdf.ln()
 
@@ -301,7 +332,7 @@ class DashboardPage(QWidget):
                 scores = [max(0, 100 - (r[1] * 2)) for r in data]
 
                 avg = sum(scores) / len(scores)
-                bad = sum(1 for x in scores if x < 60)
+                # bad = sum(1 for x in scores if x < 60)
 
                 # ===== STATUS (ЛОКАЛИЗАЦИЯ) =====
                 if avg >= 85:
@@ -319,7 +350,7 @@ class DashboardPage(QWidget):
 
                 pdf.cell(60, 8, s['starttime'].strftime("%d.%m %H:%M"), border=1)
                 pdf.cell(40, 8, str(int(avg)), border=1)
-                pdf.cell(40, 8, str(bad), border=1)
+                # pdf.cell(40, 8, str(bad), border=1)
                 pdf.cell(50, 8, status, border=1)
                 pdf.ln()
 
@@ -371,7 +402,7 @@ class DashboardPage(QWidget):
         self.pdf_btn.setText(tr("save_pdf"))
 
         self.avg_card.title_label.setText(tr("avg_score"))
-        self.bad_card.title_label.setText(tr("violations"))
+        # self.bad_card.title_label.setText(tr("violations"))
         self.sessions_card.title_label.setText(tr("total_sessions"))
         self.best_card.title_label.setText(tr("best_score"))
 
@@ -384,12 +415,36 @@ class DashboardPage(QWidget):
 
     def clear_dashboard(self):
         self.avg_card.value_label.setText("0")
-        self.bad_card.value_label.setText("0")
+        # self.bad_card.value_label.setText("0")
         self.sessions_card.value_label.setText("0")
         self.best_card.value_label.setText("0")
 
         self.ax.clear()
         self.canvas.draw()
 
-        self.good_progress.setValue(0)
-        self.bad_progress.setValue(0)
+        # self.good_progress.setValue(0)
+        # self.bad_progress.setValue(0)
+
+    def apply_chart_theme(self):
+        dark = self.settings_service and \
+            self.settings_service.get_theme() == "dark"
+
+        if dark:
+            bg = "#161b22"
+            text = "#e6edf3"
+            grid = "#30363d"
+        else:
+            bg = "#f6f8fa"
+            text = "#000000"
+            grid = "#d0d7de"
+
+        self.figure.patch.set_facecolor(bg)
+        self.ax.set_facecolor(bg)
+
+        self.ax.tick_params(colors=text)
+        self.ax.yaxis.label.set_color(text)
+        self.ax.xaxis.label.set_color(text)
+        self.ax.title.set_color(text)
+
+        for spine in self.ax.spines.values():
+            spine.set_color(grid)
