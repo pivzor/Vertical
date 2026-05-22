@@ -4,12 +4,6 @@
 
 # 🚀 Вертикаль — система контроля осанки
 
-![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)
-![Platform](https://img.shields.io/badge/Platform-Windows-lightgrey.svg)
-![AI](https://img.shields.io/badge/AI-Computer%20Vision-orange.svg)
-![Database](https://img.shields.io/badge/DB-PostgreSQL-blue.svg)
-![Status](https://img.shields.io/badge/Status-Diploma%20Project-success.svg)
-
 ---
 
 ## 📌 О проекте
