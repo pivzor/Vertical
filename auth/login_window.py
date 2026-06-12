@@ -11,11 +11,13 @@ class LoginWindow(QMainWindow):
     def __init__(self, on_login_success):
         super().__init__()
         self.setWindowTitle("Posture Checker")
-        self.resize(400, 350)
+        self.resize(620, 520)
+        self.setMinimumSize(620, 520)
         self.on_login_success = on_login_success
 
         self.db = DBHandler()
         self.settings_service = SettingsService()
+        self.apply_theme()
 
         try:
             self.db.connect()
@@ -37,18 +39,33 @@ class LoginWindow(QMainWindow):
         self.setCentralWidget(central_widget)
 
         main_layout = QVBoxLayout()
+        main_layout.setContentsMargins(40, 40, 40, 40)
+        main_layout.setSpacing(20)
 
-        # Кнопка переключения языка в правом верхнем углу
+        # Кнопка переключения языка
         top_layout = QHBoxLayout()
+
         self.lang_btn = QPushButton()
-        self.lang_btn.setFixedWidth(80)
+        self.lang_btn.setObjectName("langButton")
+
+        self.lang_btn.setMinimumWidth(130)
+        self.lang_btn.setMinimumHeight(46)
+
         self.lang_btn.clicked.connect(self.toggle_language)
+
         top_layout.addStretch()
         top_layout.addWidget(self.lang_btn)
+
         main_layout.addLayout(top_layout)
+
+        # main_layout.addSpacing(20)
+        # main_layout.addWidget(self.hero_title)
+        # main_layout.addWidget(self.hero_subtitle)
+        # main_layout.addSpacing(10)
 
         # Вкладки
         self.tabs = QTabWidget()
+        self.tabs.setObjectName("authTabs")
 
         # Вкладка входа
         self.login_widget = QWidget()
@@ -56,10 +73,12 @@ class LoginWindow(QMainWindow):
 
         self.login_user_label = QLabel()
         self.login_user = QLineEdit()
+        self.login_user.setMinimumHeight(46)
         self.login_user.setPlaceholderText("username")
 
         self.login_pass_label = QLabel()
         self.login_pass = QLineEdit()
+        self.login_pass.setMinimumHeight(46)
         self.login_pass.setPlaceholderText("password")
         self.login_pass.setEchoMode(QLineEdit.Password)
 
@@ -82,15 +101,18 @@ class LoginWindow(QMainWindow):
 
         self.reg_user_label = QLabel()
         self.reg_user = QLineEdit()
+        self.reg_user.setMinimumHeight(46)
         self.reg_user.setPlaceholderText("username")
 
         self.reg_pass_label = QLabel()
         self.reg_pass = QLineEdit()
+        self.reg_pass.setMinimumHeight(46)
         self.reg_pass.setPlaceholderText("password")
         self.reg_pass.setEchoMode(QLineEdit.Password)
 
         self.reg_pass2_label = QLabel()
         self.reg_pass2 = QLineEdit()
+        self.reg_pass2.setMinimumHeight(46)
         self.reg_pass2.setPlaceholderText("confirm password")
         self.reg_pass2.setEchoMode(QLineEdit.Password)
 
@@ -120,11 +142,13 @@ class LoginWindow(QMainWindow):
         self.login_user_label.setText(tr("username"))
         self.login_pass_label.setText(tr("password"))
         self.btn_login.setText(tr("login_btn"))
+        self.btn_login.setMinimumHeight(52)
 
         self.reg_user_label.setText(tr("username"))
         self.reg_pass_label.setText(tr("password"))
         self.reg_pass2_label.setText(tr("confirm_password"))
         self.btn_register.setText(tr("register_btn"))
+        self.btn_register.setMinimumHeight(52)
 
         self.tabs.setTabText(0, tr("login"))
         self.tabs.setTabText(1, tr("register"))
@@ -150,7 +174,15 @@ class LoginWindow(QMainWindow):
 
         user = self.db.authenticate_user(username, password)
         if user:
-            QMessageBox.information(self, tr("success"), tr("login_success").format(username))
+            QMessageBox.information(
+                self,
+                tr("success"),
+                tr("login_success").format(username)
+            )
+
+            # СОХРАНЕНИЕ СЕССИИ
+            self.settings_service.save_user_session(user['userid'], remember=False)
+
             self.on_login_success(user['userid'])
             self.close()
         else:
@@ -181,3 +213,20 @@ class LoginWindow(QMainWindow):
     def closeEvent(self, event):
         self.db.close()
         event.accept()
+
+    def apply_theme(self):
+        """Применение темы к окну авторизации"""
+
+        theme = self.settings_service.get_theme()
+
+        styles_path = (  
+            "styles/style_dark.qss"
+            if theme == "dark"
+            else "styles/style_light.qss"
+        )
+
+        try:
+            with open(styles_path, "r", encoding="utf-8") as f:
+                self.setStyleSheet(f.read())
+        except Exception as e:
+            print("Theme load error:", e)

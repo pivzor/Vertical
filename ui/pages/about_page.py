@@ -35,7 +35,7 @@ class AboutPage(QWidget):
         # Название программы
         self.app_name = QLabel()
         app_name_font = QFont()
-        app_name_font.setPointSize(18)
+        app_name_font.setPointSize(24)
         app_name_font.setBold(True)
         self.app_name.setFont(app_name_font)
         self.app_name.setAlignment(Qt.AlignCenter)
@@ -71,7 +71,7 @@ class AboutPage(QWidget):
 
         self.posture_title = QLabel()
         posture_title_font = QFont()
-        posture_title_font.setPointSize(14)
+        posture_title_font.setPointSize(18)
         posture_title_font.setBold(True)
         self.posture_title.setFont(posture_title_font)
         self.posture_title.setAlignment(Qt.AlignCenter)

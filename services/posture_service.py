@@ -48,7 +48,7 @@ class PostureService:
 
         #Центральная точка между плечами
         mid_sh_x = (l_sh.x + r_sh.x) / 2
-        mid_sh_y = (l_sh.y + r_sh.y) / 2
+        #mid_sh_y = (l_sh.y + r_sh.y) / 2
 
         #Смещение головы относительно центра плеч
         head_offset = abs(nose.x - mid_sh_x)

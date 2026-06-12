@@ -38,15 +38,30 @@ Filename: "{app}\Vertical.exe"
 
 [Run]
 
+; ===== УСТАНОВКА POSTGRES =====
+
 Filename: "{tmp}\postgresql.exe"; \
 Parameters: "--mode unattended --unattendedmodeui minimal --superpassword 12345678"; \
 StatusMsg: "Установка PostgreSQL..."; \
-Flags: waituntilterminated
+Flags: waituntilterminated; \
+Check: not IsPostgresInstalled
+
+; ===== НАСТРОЙКА БД =====
 
 Filename: "{tmp}\setup_postgres.bat"; \
 StatusMsg: "Настройка базы данных..."; \
 Flags: runhidden waituntilterminated
 
+; ===== ЗАПУСК ПРИЛОЖЕНИЯ =====
+
 Filename: "{app}\Vertical.exe"; \
 Description: "Запустить Vertical"; \
 Flags: nowait postinstall skipifsilent
+
+[Code]
+
+function IsPostgresInstalled(): Boolean;
+begin
+  Result :=
+    RegKeyExists(HKLM, 'SOFTWARE\PostgreSQL\Installations');
+end;

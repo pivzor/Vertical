@@ -58,6 +58,7 @@ class DashboardPage(QWidget):
 
         self.session_combo = QComboBox()
         self.session_combo.currentIndexChanged.connect(self.update_dashboard)
+        self.session_combo.setFixedWidth(150)       
         filter_layout.addWidget(self.session_combo)
 
         self.refresh_btn = QPushButton()
@@ -124,6 +125,7 @@ class DashboardPage(QWidget):
 
         title = QLabel()
         value = QLabel("0")
+        value.setProperty("class", "value-large")
         value.setAlignment(Qt.AlignCenter)
 
         layout.addWidget(title)
@@ -426,6 +428,17 @@ class DashboardPage(QWidget):
         # self.bad_progress.setValue(0)
 
     def apply_chart_theme(self):
+
+        self.ax.title.set_fontsize(18)
+        self.ax.xaxis.label.set_fontsize(14)
+        self.ax.yaxis.label.set_fontsize(14)
+
+        for label in self.ax.get_xticklabels():
+            label.set_fontsize(12)
+
+        for label in self.ax.get_yticklabels():
+            label.set_fontsize(12)
+
         dark = self.settings_service and \
             self.settings_service.get_theme() == "dark"
 

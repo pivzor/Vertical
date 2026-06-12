@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import (
-    QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame,
+    QSizePolicy, QWidget, QVBoxLayout, QHBoxLayout, QLabel, QFrame,
     QPushButton, QMessageBox, QComboBox
 )
 from PyQt5.QtCore import Qt, QTimer
@@ -11,6 +11,8 @@ import cv2
 
 from PyQt5.QtWidgets import QSystemTrayIcon, QStyle
 from PyQt5.QtCore import QDateTime
+from win10toast import ToastNotifier
+from utils.resource_path import resource_path
 
 
 class MonitoringPage(QWidget):
@@ -28,10 +30,11 @@ class MonitoringPage(QWidget):
         self.current_session_id = None
 
         self.smooth_buffer = []
+        self.toaster = ToastNotifier()
 
-        self.tray = QSystemTrayIcon(self)
-        self.tray.setIcon(self.style().standardIcon(QStyle.SP_ComputerIcon))
-        self.tray.setVisible(True)
+        self.last_notify_time = (
+            QDateTime.currentDateTime().addSecs(-60)
+        )
 
         self.last_notify_time = QDateTime.currentDateTime().addSecs(-60)
 
@@ -42,7 +45,7 @@ class MonitoringPage(QWidget):
 
         QTimer.singleShot(100, self.load_cameras)
 
-    # ================= UI =================
+    #UI
     def init_ui(self):
         main_layout = QHBoxLayout()
         main_layout.setSpacing(20)
@@ -61,13 +64,19 @@ class MonitoringPage(QWidget):
         self.video_container = QFrame()
         self.video_container.setObjectName("videoContainer")
         self.video_layout = QVBoxLayout()
+        self.video_container.setMinimumHeight(700)
+
+        self.video_container.setSizePolicy(
+            QSizePolicy.Expanding,
+            QSizePolicy.Expanding
+        )
         self.video_layout.setContentsMargins(0, 0, 0, 0)
         self.video_container.setLayout(self.video_layout)
 
         left_layout.addWidget(self.video_container)
         left.setLayout(left_layout)
 
-        main_layout.addWidget(left, 3)
+        main_layout.addWidget(left, 5)
 
         # RIGHT (панель)
         right = QFrame()
@@ -116,12 +125,12 @@ class MonitoringPage(QWidget):
         right_layout.addWidget(self.stop_btn)
 
         right.setLayout(right_layout)
-        main_layout.addWidget(right, 1)
+        main_layout.addWidget(right, 2)
 
         self.setLayout(main_layout)
         self.retranslate_ui()
 
-    # ================= CAMERAS =================
+    #CAMERAS
     def load_cameras(self):
         self.camera_selector.clear()
 
@@ -141,12 +150,12 @@ class MonitoringPage(QWidget):
         if self.camera and cam_id != -1:
             self.camera.set_camera(cam_id)
 
-    # ================= MODE =================
+    #MODE
     def on_mode_changed(self):
         if self.camera:
             self.camera.service.set_mode(self.mode_selector.currentData())
 
-    # ================= START =================
+    #START
     def start_monitoring(self):
         if self.session_active:
             QMessageBox.warning(self, tr("warning"), tr("monitoring_active"))
@@ -189,7 +198,7 @@ class MonitoringPage(QWidget):
         self.camera.posture_updated.connect(self.on_posture_update)
         self.video_layout.addWidget(self.camera)
 
-    # ================= STOP =================
+    #STOP
     def stop_monitoring(self):
         if not self.session_active:
             return
@@ -236,7 +245,7 @@ class MonitoringPage(QWidget):
         except Exception as e:
             QMessageBox.critical(self, tr("error"), str(e))
 
-    # ================= POSTURE =================
+    #POSTURE
     def on_posture_update(self, score, status):
         if not self.session_active:
             return
@@ -266,12 +275,16 @@ class MonitoringPage(QWidget):
         else:
             self.status_text.setText(tr("posture_bad"))
 
-        # =========================
-        # 🚨 УВЕДОМЛЕНИЯ
-        # =========================
+
+        #УВЕДОМЛЕНИЯ
 
         is_bad = score < 60
-        app_in_background = self.isMinimized() or not self.isActiveWindow()
+        main_window = self.window()
+
+        app_in_background = (
+            main_window.isMinimized()
+            or not main_window.isActiveWindow()
+        )
 
         now = QDateTime.currentDateTime()
 
@@ -279,19 +292,25 @@ class MonitoringPage(QWidget):
             if self.last_notify_time.secsTo(now) > 25:
                 self.show_notification(
                     tr("warning"),
-                    tr("session_end_bad")  # или отдельный ключ лучше сделать
+                    tr("session_end_bad")  
                 )
                 self.last_notify_time = now
 
     def show_notification(self, title, message):
-        self.tray.showMessage(
-            title,
-            message,
-            QSystemTrayIcon.Information,
-            3000
-        )
 
-    # ================= UI =================
+        try:
+            self.toaster.show_toast(
+                title,
+                message,
+                icon_path=resource_path("assets/img/icon.ico"),
+                duration=3,
+                threaded=True
+            )
+
+        except Exception as e:
+            print("Notification error:", e)
+
+    #UI
     def retranslate_ui(self):
         self.video_title.setText(tr("video_stream"))
         self.title.setText(tr("monitoring_title"))

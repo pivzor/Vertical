@@ -21,9 +21,11 @@ Vertical.spec
 *.spec
 *.log
 app.txt
-
+  
 # Файлы локальных конфигураций
 settings.json
 .env
 
 docs/
+
+tests/

@@ -96,45 +96,45 @@ class SettingsPage(QWidget):
         layout.addWidget(theme_card)
 
         # Карточка точности
-        accuracy_card = QFrame()
-        accuracy_card.setObjectName("card")
-        accuracy_layout = QVBoxLayout()
-        accuracy_layout.setSpacing(15)
+        # accuracy_card = QFrame()
+        # accuracy_card.setObjectName("card")
+        # accuracy_layout = QVBoxLayout()
+        # accuracy_layout.setSpacing(15)
 
-        self.accuracy_title = QLabel()
-        self.accuracy_title.setProperty("class", "title-card")
-        accuracy_layout.addWidget(self.accuracy_title)
+        # self.accuracy_title = QLabel()
+        # self.accuracy_title.setProperty("class", "title-card")
+        # accuracy_layout.addWidget(self.accuracy_title)
 
-        self.accuracy_desc = QLabel()
-        self.accuracy_desc.setProperty("class", "label-small")
-        self.accuracy_desc.setWordWrap(True)
-        accuracy_layout.addWidget(self.accuracy_desc)
+        # self.accuracy_desc = QLabel()
+        # self.accuracy_desc.setProperty("class", "label-small")
+        # self.accuracy_desc.setWordWrap(True)
+        # accuracy_layout.addWidget(self.accuracy_desc)
 
-        self.accuracy_slider = QSlider(Qt.Horizontal)
-        self.accuracy_slider.setMinimum(0)
-        self.accuracy_slider.setMaximum(100)
-        self.accuracy_slider.setTickInterval(10)
-        self.accuracy_slider.valueChanged.connect(self.on_accuracy_changed)
-        accuracy_layout.addWidget(self.accuracy_slider)
+        # self.accuracy_slider = QSlider(Qt.Horizontal)
+        # self.accuracy_slider.setMinimum(0)
+        # self.accuracy_slider.setMaximum(100)
+        # self.accuracy_slider.setTickInterval(10)
+        # self.accuracy_slider.valueChanged.connect(self.on_accuracy_changed)
+        # accuracy_layout.addWidget(self.accuracy_slider)
 
-        self.accuracy_value = QLabel()
-        self.accuracy_value.setProperty("class", "accuracy-value")
-        self.accuracy_value.setAlignment(Qt.AlignCenter)
-        accuracy_layout.addWidget(self.accuracy_value)
+        # self.accuracy_value = QLabel()
+        # self.accuracy_value.setProperty("class", "accuracy-value")
+        # self.accuracy_value.setAlignment(Qt.AlignCenter)
+        # accuracy_layout.addWidget(self.accuracy_value)
 
-        hints_layout = QHBoxLayout()
-        self.hint_fast = QLabel()
-        hints_layout.addWidget(self.hint_fast)
-        hints_layout.addStretch()
-        self.hint_medium = QLabel()
-        hints_layout.addWidget(self.hint_medium)
-        hints_layout.addStretch()
-        self.hint_high = QLabel()
-        hints_layout.addWidget(self.hint_high)
-        accuracy_layout.addLayout(hints_layout)
+        # hints_layout = QHBoxLayout()
+        # self.hint_fast = QLabel()
+        # hints_layout.addWidget(self.hint_fast)
+        # hints_layout.addStretch()
+        # self.hint_medium = QLabel()
+        # hints_layout.addWidget(self.hint_medium)
+        # hints_layout.addStretch()
+        # self.hint_high = QLabel()
+        # hints_layout.addWidget(self.hint_high)
+        # accuracy_layout.addLayout(hints_layout)
 
-        accuracy_card.setLayout(accuracy_layout)
-        layout.addWidget(accuracy_card)
+        # accuracy_card.setLayout(accuracy_layout)
+        # layout.addWidget(accuracy_card)
 
         # --- КАРТОЧКА СКЕЛЕТА ---
         skeleton_card = QFrame()
@@ -168,8 +168,8 @@ class SettingsPage(QWidget):
         self.skeleton_title.setText(tr("show_skeleton"))
         self.skeleton_checkbox.setText(tr("enable_skeleton"))
         self.theme_title.setText(tr("theme_title"))
-        self.accuracy_title.setText(tr("accuracy_title"))
-        self.accuracy_desc.setText(tr("accuracy_desc"))
+        # self.accuracy_title.setText(tr("accuracy_title"))
+        # self.accuracy_desc.setText(tr("accuracy_desc"))
 
         # Обновляем элементы ComboBox без сигналов
         self.theme_combo.blockSignals(True)
@@ -194,13 +194,13 @@ class SettingsPage(QWidget):
                 break
         self.lang_combo.blockSignals(False)
 
-        self.hint_fast.setText(tr("accuracy_fast"))
-        self.hint_medium.setText(tr("accuracy_medium"))
-        self.hint_high.setText(tr("accuracy_high"))
+        # self.hint_fast.setText(tr("accuracy_fast"))
+        # self.hint_medium.setText(tr("accuracy_medium"))
+        # self.hint_high.setText(tr("accuracy_high"))
 
         # Обновляем текущую точность
-        accuracy = self.settings_service.get_accuracy()
-        self.update_accuracy_label(accuracy)
+        # accuracy = self.settings_service.get_accuracy()
+        # self.update_accuracy_label(accuracy)
 
     def load_current_settings(self):
         """Загрузка текущих настроек"""
@@ -245,13 +245,13 @@ class SettingsPage(QWidget):
         value = state == Qt.Checked
         self.settings_service.set_show_skeleton(value)
 
-    def update_accuracy_label(self, accuracy):
-        if accuracy >= 0.8:
-            self.accuracy_value.setText(tr("accuracy_high"))
-        elif accuracy >= 0.6:
-            self.accuracy_value.setText(tr("accuracy_medium"))
-        else:
-            self.accuracy_value.setText(tr("accuracy_fast"))
+    # def update_accuracy_label(self, accuracy):
+    #     if accuracy >= 0.8:
+    #         self.accuracy_value.setText(tr("accuracy_high"))
+    #     elif accuracy >= 0.6:
+    #         self.accuracy_value.setText(tr("accuracy_medium"))
+    #     else:
+    #         self.accuracy_value.setText(tr("accuracy_fast"))
 
     def on_language_changed(self, index):
         if self._updating:
@@ -279,19 +279,17 @@ class SettingsPage(QWidget):
 
     def logout(self):
         reply = QMessageBox.question(
-            self, tr("confirm_logout"), tr("confirm_logout_msg"),
+            self,
+            tr("confirm_logout"),
+            tr("confirm_logout_msg"),
             QMessageBox.Yes | QMessageBox.No
         )
 
         if reply == QMessageBox.Yes:
-            # Удаляем файл сессии
-            if os.path.exists("session.json"):
-                os.remove("session.json")
+            self.settings_service.clear_user_session()  # ✔️ ВОТ ЭТО ГЛАВНОЕ
 
-            # Закрываем главное окно (closeEvent сам остановит таймеры)
             self.window().close()
 
-            # Создаем и показываем окно авторизации
             from auth.login_window import LoginWindow
             self.login_window = LoginWindow(
                 on_login_success=lambda uid: self.restart_main_window(uid)

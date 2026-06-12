@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QStackedWidget, QApplication
 from PyQt5.QtCore import Qt
+from PyQt5.QtWidgets import QApplication
 
 from ui.widgets.sidebar import Sidebar
 from ui.pages.dashboard_page import DashboardPage
@@ -19,8 +20,17 @@ class MainWindow(QMainWindow):
     def __init__(self, user_id, settings_service):
         super().__init__()
 
+        screen = QApplication.primaryScreen()
+        size = screen.availableGeometry()
+
+        w = int(size.width() * 0.82)
+        h = int(size.height() * 0.82)
+
+        self.resize(w, h)
+
         self.setWindowTitle("Posture App")
-        self.resize(1400, 800)
+        self.resize(1700, 950)
+        self.setMinimumSize(1400, 850)
         self.setAttribute(Qt.WA_StyledBackground, True)
 
         # ===== SERVICES =====
@@ -32,7 +42,6 @@ class MainWindow(QMainWindow):
 
         self.analyzer = RealtimeAnalyzer()
 
-        # 🔥 ВАЖНО: ЕДИНЫЙ SETTINGS SERVICE
         self.settings_service = settings_service
 
         # ===== LANGUAGE =====
@@ -55,16 +64,12 @@ class MainWindow(QMainWindow):
 
         self.setCentralWidget(container)
 
-        # ===== THEME =====
         self.apply_theme(self.settings_service.get_theme())
 
-        # ===== FIRST PAGE =====
         self.switch_page("dashboard")
         self.retranslate_ui()
 
-    # =========================
-    # THEME FIX (КЛЮЧЕВОЙ МОМЕНТ)
-    # =========================
+
     def apply_theme(self, theme):
         css_file = resource_path(
             f"styles/style_{theme}.qss"
@@ -76,7 +81,6 @@ class MainWindow(QMainWindow):
 
             app = QApplication.instance()
 
-            # 🔥 ВАЖНО: сброс перед применением
             app.setStyleSheet("")
             app.processEvents()
             app.setStyleSheet(style)
