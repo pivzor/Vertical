@@ -9,7 +9,8 @@ from fpdf import FPDF
 from locales.locale_manager import tr
 import os
 from utils.resource_path import resource_path
-
+import tempfile
+import shutil
 
 class DashboardPage(QWidget):
     def __init__(self, analyzer, db, user_id, settings_service=None):
@@ -293,10 +294,19 @@ class DashboardPage(QWidget):
             pdf = FPDF()
             pdf.add_page()
 
+            original_font = resource_path("assets/fonts/DejaVuSans.ttf")
+
+            temp_font = os.path.join(
+                tempfile.gettempdir(),
+                "DejaVuSans.ttf"
+            )
+
+            shutil.copyfile(original_font, temp_font)
+
             pdf.add_font(
                 "DejaVu",
                 "",
-                resource_path("assets/fonts/DejaVuSans.ttf"),
+                temp_font,
                 uni=True
             )
 

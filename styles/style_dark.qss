@@ -71,7 +71,7 @@ QLabel {
 }
 
 .value-score {
-    font-size: 64px;
+    font-size: 96px;
     font-weight: 900;
 }
 
@@ -235,4 +235,11 @@ QProgressBar::chunk {
     color: #9ca3af;
     font-size: 18px;
     font-weight: 800;
+}
+
+.posture-status {
+    font-size: 28px;
+    font-weight: 800;
+    border-radius: 14px;
+    padding: 10px;
 }
