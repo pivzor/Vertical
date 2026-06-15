@@ -6,202 +6,238 @@ from locales.locale_manager import tr
 
 class PostureService:
     def __init__(self, accuracy=0.6):
+
+        # Модуль MediaPipe Pose
         self.mp_pose = mp.solutions.pose
+
+        # Коэффициент точности анализа
         self.accuracy = accuracy
 
-        #Инициализация модели распознавания позы
+        # Инициализация модели распознавания позы
         self.pose = self._create_pose()
 
-        #Буфер для сглаживания оценки осанки
-        self.score_buffer = deque(maxlen=35)
+        # Буфер сглаживания оценок осанки
+        self.score_buffer = deque(maxlen=15)
 
-        #Последний вычисленный угол шеи
+        # Последний вычисленный угол шеи
         self.last_angle = 180
 
-        #Режим анализа: front / side
+        # Режим анализа (front / side)
         self.mode = "front"
 
-    #Установка режима анализа
+    # Установка режима анализа
     def set_mode(self, mode: str):
         self.mode = mode
 
-    #Создание модели MediaPipe Pose
+    # Создание модели MediaPipe Pose
     def _create_pose(self):
+
         return self.mp_pose.Pose(
-            model_complexity=2,
-            min_detection_confidence=0.3 + self.accuracy * 0.5,
-            min_tracking_confidence=0.3 + self.accuracy * 0.5
+
+            # Упрощённая модель для уменьшения нагрузки
+            model_complexity=0,
+
+            # Минимальная уверенность обнаружения человека
+            min_detection_confidence=0.5,
+
+            # Минимальная уверенность отслеживания
+            min_tracking_confidence=0.5
         )
 
-    #Сглаживание резких изменений оценки
+    # Сглаживание колебаний оценки осанки
     def _smooth(self, score):
+
         self.score_buffer.append(score)
+
         return sum(self.score_buffer) / len(self.score_buffer)
 
-    #Анализ осанки спереди
+    # Анализ положения пользователя спереди
     def _front(self, lm):
 
-        #Ключевые точки тела
+        # Ключевые точки тела
         nose = lm[self.mp_pose.PoseLandmark.NOSE.value]
         l_sh = lm[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value]
         r_sh = lm[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value]
 
-        #Центральная точка между плечами
+        # Центр между плечами
         mid_sh_x = (l_sh.x + r_sh.x) / 2
-        #mid_sh_y = (l_sh.y + r_sh.y) / 2
 
-        #Смещение головы относительно центра плеч
+        # Смещение головы относительно центра плеч
         head_offset = abs(nose.x - mid_sh_x)
 
-        #Перекос плеч
+        # Разница высоты плеч
         shoulder_tilt = abs(l_sh.y - r_sh.y)
 
-        #Начальная оценка осанки
+        # Начальная оценка
         score = 100
 
-        #Снижение оценки при наклоне головы
+        # Штраф за смещение головы
         score -= head_offset * 450
 
-        #Снижение оценки при перекосе плеч
+        # Штраф за перекос плеч
         score -= shoulder_tilt * 350
 
         return score, "front"
 
+    # Анализ положения пользователя сбоку
     def _side(self, lm):
 
+        # Оценка видимости левой стороны тела
         left_score = (
             lm[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value].visibility +
             lm[self.mp_pose.PoseLandmark.LEFT_HIP.value].visibility +
             lm[self.mp_pose.PoseLandmark.LEFT_KNEE.value].visibility
         )
 
+        # Оценка видимости правой стороны тела
         right_score = (
             lm[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value].visibility +
             lm[self.mp_pose.PoseLandmark.RIGHT_HIP.value].visibility +
             lm[self.mp_pose.PoseLandmark.RIGHT_KNEE.value].visibility
         )
 
+        # Выбор наиболее видимой стороны
         use_right = right_score > left_score
 
         if use_right:
+
             ear = lm[self.mp_pose.PoseLandmark.RIGHT_EAR.value]
             shoulder = lm[self.mp_pose.PoseLandmark.RIGHT_SHOULDER.value]
             hip = lm[self.mp_pose.PoseLandmark.RIGHT_HIP.value]
             knee = lm[self.mp_pose.PoseLandmark.RIGHT_KNEE.value]
+
         else:
+
             ear = lm[self.mp_pose.PoseLandmark.LEFT_EAR.value]
             shoulder = lm[self.mp_pose.PoseLandmark.LEFT_SHOULDER.value]
             hip = lm[self.mp_pose.PoseLandmark.LEFT_HIP.value]
             knee = lm[self.mp_pose.PoseLandmark.LEFT_KNEE.value]
 
-        points = [ear, shoulder, hip, knee]
+        # Проверка видимости всех точек
+        for p in (ear, shoulder, hip, knee):
 
-        for p in points:
             if p.visibility < 0.5:
                 return None, tr("posture_bad_visibility")
 
-
+        # Высота корпуса
         body_height = abs(shoulder.y - hip.y)
 
+        # Проверка корректности данных
         if body_height < 0.05:
             return None, tr("posture_bad_visibility")
 
+        # Смещение головы вперёд
         head_forward = abs(ear.x - shoulder.x) / body_height
+
+        # Смещение плеч вперёд
         shoulder_forward = abs(shoulder.x - hip.x) / body_height
+
+        # Смещение таза
         hip_shift = abs(hip.x - knee.x) / body_height
 
-
+        # Угол шеи
         neck_angle = self.calculate_angle(
             (ear.x, ear.y),
             (shoulder.x, shoulder.y),
             (hip.x, hip.y)
         )
 
+        # Угол спины
         back_angle = self.calculate_angle(
             (shoulder.x, shoulder.y),
             (hip.x, hip.y),
             (knee.x, knee.y)
         )
 
+        # Сохранение последнего угла шеи
         self.last_angle = neck_angle
 
-
+        # Начальная оценка
         score = 100
-        # голова
+
+        # Штраф за положение головы
         score -= head_forward * 18
-        # плечи
+
+        # Штраф за положение плеч
         score -= shoulder_forward * 22
-        # таз
+
+        # Штраф за положение таза
         score -= hip_shift * 12
-        # шея
+
+        # Штраф за угол шеи
         if neck_angle < 140:
             score -= (140 - neck_angle) * 0.8
-        # спина
+
+        # Штраф за угол спины
         if back_angle < 160:
             score -= (160 - back_angle) * 0.7
 
         return score, "side"
-    
-    #Вычисление угла между тремя точками
+
+    # Вычисление угла между тремя точками
     def calculate_angle(self, a, b, c):
+
         ax, ay = a
         bx, by = b
         cx, cy = c
 
-        #Формирование векторов
+        # Формирование векторов
         ab = (ax - bx, ay - by)
         cb = (cx - bx, cy - by)
 
-        #Скалярное произведение векторов
+        # Скалярное произведение
         dot = ab[0] * cb[0] + ab[1] * cb[1]
 
-        #Вычисление длин векторов
-        mag1 = math.sqrt(ab[0] ** 2 + ab[1] ** 2)
-        mag2 = math.sqrt(cb[0] ** 2 + cb[1] ** 2)
+        # Длины векторов
+        mag1 = math.hypot(ab[0], ab[1])
+        mag2 = math.hypot(cb[0], cb[1])
 
-        #Проверка деления на ноль
+        # Защита от деления на ноль
         if mag1 * mag2 == 0:
             return 180
 
-        #Вычисление угла
-        angle = math.degrees(
-            math.acos(dot / (mag1 * mag2))
-        )
+        # Косинус угла
+        cos_angle = dot / (mag1 * mag2)
 
-        return angle
-        
-    #Основной метод анализа кадра
+        # Ограничение диапазона
+        cos_angle = max(-1, min(1, cos_angle))
+
+        # Перевод в градусы
+        return math.degrees(math.acos(cos_angle))
+
+    # Анализ одного кадра изображения
     def analyze(self, frame):
 
-        #Преобразование изображения из BGR в RGB
+        # Преобразование изображения BGR → RGB
         rgb = frame[:, :, ::-1]
 
-        #Обработка изображения моделью MediaPipe
+        # Обработка изображения моделью
         result = self.pose.process(rgb)
 
-        #Проверка наличия человека в кадре
+        # Проверка наличия человека в кадре
         if not result.pose_landmarks:
             return None, 0, tr("posture_no_person"), result
 
-        #Получение ключевых точек тела
+        # Получение списка ключевых точек
         lm = result.pose_landmarks.landmark
 
-        #Выбор режима анализа
+        # Выбор режима анализа
         if self.mode == "front":
             raw_score, status = self._front(lm)
         else:
             raw_score, status = self._side(lm)
 
+        # Проверка корректности результата
         if raw_score is None:
             return None, 0, status, result
 
-        #Сглаживание итоговой оценки
+        # Сглаживание оценки
         score = int(self._smooth(raw_score))
 
-        #Ограничение диапазона значений
+        # Ограничение диапазона значений
         score = max(0, min(100, score))
 
-        #Определение текстового состояния осанки
+        # Определение текстового состояния осанки
         if score >= 85:
             status = tr("posture_excellent")
 
@@ -214,8 +250,10 @@ class PostureService:
         elif score >= 40:
             status = tr("posture_slouch")
 
+        else:
+            status = tr("posture_bad")
 
-        #Сохранение координат ключевых точек
+        # Сохранение координат ключевых точек
         keypoints = [(p.x, p.y, p.z) for p in lm]
 
         return keypoints, score, status, result

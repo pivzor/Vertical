@@ -257,7 +257,7 @@ class MonitoringPage(QWidget):
                 tr("session_end_msg").format(
                     self.current_session_id,
                     self.analyzer.get_avg(),
-                    len(self.analyzer.scores)
+                    # len(self.analyzer.scores)
                 ),
                 QMessageBox.Yes | QMessageBox.No
             )
@@ -299,17 +299,17 @@ class MonitoringPage(QWidget):
 
         self.analyzer.add_score(score)
 
-        try:
-            self.db.add_pose_data(
-                self.current_session_id,
-                neck_angle=score,
-                posture_status=status,
-                keypoints=[]
-            )
-        except Exception as e:
-            print("DB save error:", e)
+        # try:
+        #     self.db.add_pose_data(
+        #         self.current_session_id,
+        #         neck_angle=score,
+        #         posture_status=status,
+        #         keypoints=[]
+        #     )
+        # except Exception as e:
+        #     print("DB save error:", e)
 
-        self.last_score = int(score)
+        # self.last_score = int(score)
 
         # Цветовая схема
         if score >= 85:

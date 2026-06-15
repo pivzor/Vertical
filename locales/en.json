@@ -90,7 +90,7 @@
     "session_start_error": "Start error: {0}",
     "session_end_error": "End error: {0}",
     "session_end_confirm": "End Session",
-    "session_end_msg": "End session #{0}?\n\nAvg Score: {1}\nFrames: {2}",
+    "session_end_msg": "End session #{0}?\n\nAvg Score: {1}",
     "session_end_success": "Session ended",
     "session_end_excellent": "Excellent!",
     "session_end_good": "Good!",

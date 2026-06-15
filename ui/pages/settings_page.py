@@ -285,16 +285,47 @@ class SettingsPage(QWidget):
             QMessageBox.Yes | QMessageBox.No
         )
 
-        if reply == QMessageBox.Yes:
-            self.settings_service.clear_user_session()  # ✔️ ВОТ ЭТО ГЛАВНОЕ
+        if reply != QMessageBox.Yes:
+            return
 
-            self.window().close()
+        # Сбрасываем сохранённую сессию
+        self.settings_service.clear_user_session()
 
-            from auth.login_window import LoginWindow
-            self.login_window = LoginWindow(
-                on_login_success=lambda uid: self.restart_main_window(uid)
-            )
-            self.login_window.show()
+        from auth.login_window import LoginWindow
+        from PyQt5.QtWidgets import QApplication
+
+        app = QApplication.instance()
+
+        # Создаём новое окно логина и сохраняем в app, чтобы не удалилось
+        login = LoginWindow(
+            on_login_success=lambda uid, remember=False:
+                self._on_relogin(uid, remember)
+        )
+
+        app.login_window = login  # ← держим ссылку
+        login.show()
+
+        # Закрываем главное окно ПОСЛЕ создания login
+        self.window().close()
+
+
+    def _on_relogin(self, user_id, remember=False):
+        """Перезапуск главного окна после повторного входа"""
+        from ui.main_window import MainWindow
+        from PyQt5.QtWidgets import QApplication
+
+        app = QApplication.instance()
+
+        self.settings_service.save_user_session(user_id, remember=remember)
+
+        window = MainWindow(user_id, self.settings_service)
+        window.show()
+        app.main_window = window
+
+        # Закрываем окно логина
+        if hasattr(app, "login_window") and app.login_window:
+            app.login_window.close()
+            app.login_window = None
 
     def restart_main_window(self, user_id):
         """Перезапуск главного окна после входа"""

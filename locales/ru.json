@@ -90,7 +90,7 @@
     "session_start_error": "Ошибка запуска: {0}",
     "session_end_error": "Ошибка завершения: {0}",
     "session_end_confirm": "Завершение сессии",
-    "session_end_msg": "Завершить сессию #{0}?\n\nСредний балл: {1}\nКадров: {2}",
+    "session_end_msg": "Завершить сессию #{0}?\n\nСредний балл: {1}",
     "session_end_success": "Сессия завершена",
     "session_end_excellent": "Отлично!",
     "session_end_good": "Хорошо!",

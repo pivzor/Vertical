@@ -45,7 +45,7 @@ class CameraWidget(QWidget):
         # Таймер обновления кадров
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_frame)
-        self.timer.start(30)#кадр/сек
+        self.timer.start(30             )#кадр/сек
 
     # Переключение камеры
     def set_camera(self, index: int):

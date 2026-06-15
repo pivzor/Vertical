@@ -155,7 +155,7 @@ class SettingsService:
 
     #СЕССИЯ
     # Сохранение пользовательской сессии
-    def save_user_session(self, user_id, remember=False):
+    def save_user_session(self, user_id, remember=True):
 
         self.settings["user_id"] = user_id
         self.settings["remember_user"] = remember
